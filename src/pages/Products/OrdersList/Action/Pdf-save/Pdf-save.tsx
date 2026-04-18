@@ -3,7 +3,7 @@ import { Document, Page, Text, View, StyleSheet, Font, Image, Path } from '@reac
 import { IOrder } from '@/api/order/types';
 import { priceFormat } from '@/utils/priceFormat';
 import { getFullDateFormat } from '@/utils/getDateFormat';
-import LogoImg from '@/assets/img/jas-logo.jpg';
+import LogoImg from '../../../../../../public/images/kas-logo.png';
 import CheckmarkIcon from '@/assets/img/check-mark.png';
 import { phoneFormat } from '@/utils/phoneFormat';
 

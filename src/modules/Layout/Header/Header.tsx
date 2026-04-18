@@ -53,10 +53,10 @@ export const Header = observer(({ collapsed, onCollapsedClick, isMobile }: Props
             ? <MenuUnfoldOutlined className="header__icon" />
             : <MenuFoldOutlined className="header__icon" />}
         </Button>
-        {!isMobile && authStore.isCloseDay && <span className="layout__logo-text">JAS || Kassa yopilgan</span>}
+        {!isMobile && authStore.isCloseDay && <span className="layout__logo-text">KAS || Kassa yopilgan</span>}
         {isMobile &&
           <span className="layout__logo-text">
-            {authStore.isCloseDay ? 'Kun yopilgan' : 'JAS'}
+            {authStore.isCloseDay ? 'Kun yopilgan' : 'KAS'}
           </span>
         }
 

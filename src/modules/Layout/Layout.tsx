@@ -34,7 +34,7 @@ export const Layout = () => {
       >
         {!isTablet && (
           <div className="layout__logo">
-            {!value && <span className="layout__logo-text">JAS</span>}
+            {!value && <span className="layout__logo-text">KAS</span>}
           </div>
         )}
 
