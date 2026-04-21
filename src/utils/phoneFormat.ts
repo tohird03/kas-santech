@@ -1,11 +1,16 @@
-export const formatPhoneNumber = (phoneNumber: string) => {
-  const formattedNumber = phoneNumber.replace(
+export const formatPhoneNumber = (phoneNumber?: string | number | null) => {
+  if (!phoneNumber) return '';
+
+  const cleaned = String(phoneNumber);
+
+  const formattedNumber = cleaned.replace(
     /^(\d{3})(\d{2})(\d{3})(\d{2})(\d{2})$/,
     '$1 $2 $3 $4 $5'
   );
 
   return formattedNumber;
 };
+
 
 export function phoneFormat(input: string | number | undefined) {
   if (!input) {
