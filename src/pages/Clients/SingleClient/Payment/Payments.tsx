@@ -38,7 +38,7 @@ export const Payments = observer(() => {
         search: singleClientStore.paymentSearch!,
         startDate: singleClientStore.startDate!,
         endDate: singleClientStore.endDate!,
-        userId: clientId,
+        clientId: clientId,
       }),
   });
 

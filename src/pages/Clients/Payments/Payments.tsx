@@ -14,11 +14,13 @@ import { addNotification } from '@/utils';
 import { staffsApi } from '@/api/staffs';
 import { priceFormat } from '@/utils/priceFormat';
 import { clientsPaymentApi } from '@/api/payment/payment';
+import { useParams } from 'react-router-dom';
 
 const cn = classNames.bind(styles);
 
 export const ClientsPayments = observer(() => {
   const [downloadLoading, setDownLoadLoading] = useState(false);
+  const {clientId} = useParams();
 
   const { data: paymentsData, isLoading: loading } = useQuery({
     queryKey: [
@@ -29,6 +31,7 @@ export const ClientsPayments = observer(() => {
       paymentsStore.startDate,
       paymentsStore.endDate,
       paymentsStore.sellerId,
+      clientId,
     ],
     queryFn: () =>
       paymentsStore.getClientsPayments({
@@ -38,6 +41,7 @@ export const ClientsPayments = observer(() => {
         startDate: paymentsStore?.startDate!,
         endDate: paymentsStore?.endDate!,
         staffId: paymentsStore.sellerId!,
+        clientId,
       }),
   });
 
