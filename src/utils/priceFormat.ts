@@ -11,7 +11,7 @@ export const priceFormat = (price: string | number | null | undefined) => {
 
   const formattedPrice = numberPrice.toLocaleString('en-US', {
     minimumFractionDigits: 0,
-    maximumFractionDigits: 3,
+    maximumFractionDigits: 5,
   }).replace(/,/g, ' ');
 
   return formattedPrice;

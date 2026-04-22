@@ -54,6 +54,7 @@ export const AddEditModal = observer(() => {
   const clientRef = useRef<any>(null);
   const { clientId } = useParams();
   const changeCostRef = useRef<any>(null);
+  const changeDiscountRef = useRef<any>(null);
   const changeCountRef = useRef<any>(null);
   const [selectedClient, setSelectedClient] = useState<IClientsInfo | null>(null);
   const [priceType, setPriceType] = useState<'cost' | 'wholesale' | 'selling'>('selling');
@@ -74,7 +75,7 @@ export const AddEditModal = observer(() => {
     queryFn: () =>
       productsListStore.getProducts({
         pageNumber: 1,
-        pageSize: 15,
+        pageSize: 50,
         search: searchProducts!,
       }),
   });
@@ -103,7 +104,7 @@ export const AddEditModal = observer(() => {
     ordersApi.updateOrder({
       status: IOrderStatus.ACCEPTED,
       id: ordersStore?.order?.id!,
-      send: ordersStore.isSendUser,
+      send: true,
       clientId: form.getFieldValue('clientId'),
     })
       .then(() => {
@@ -145,6 +146,7 @@ export const AddEditModal = observer(() => {
       productId: values?.productId,
       count: values?.count,
       price: values?.price,
+      discount: values?.discount,
       currencyId: values?.currencyId,
     };
 
@@ -326,6 +328,10 @@ export const AddEditModal = observer(() => {
     setIsUpdatingProduct({ ...isUpdatingProduct!, price: value || 0 });
   };
 
+  const handleChangeDiscount = (value: number | null) => {
+    setIsUpdatingProduct({ ...isUpdatingProduct!, discount: value || 0 });
+  };
+
   const handleChangeCount = (value: number | null) => {
     setIsUpdatingProduct({ ...isUpdatingProduct!, count: value || 0 });
   };
@@ -336,6 +342,7 @@ export const AddEditModal = observer(() => {
         id: isUpdatingProduct?.id,
         price: isUpdatingProduct?.price,
         count: isUpdatingProduct?.count,
+        discount: isUpdatingProduct?.discount,
       })
         .then(res => {
           if (res) {
@@ -432,12 +439,52 @@ export const AddEditModal = observer(() => {
         )),
     },
     {
+      key: 'discount',
+      dataIndex: 'discount',
+      title: 'Chegirma',
+      align: 'center',
+      render: (value, record) => (
+        isUpdatingProduct?.id === record?.id ? (
+          <InputNumber
+            defaultValue={record?.prices?.selling?.discount}
+            placeholder="Chegirma"
+            disabled={isUpdatingProduct?.id !== record?.id}
+            onChange={handleChangeDiscount}
+            ref={changeDiscountRef}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') {
+                handleSaveAndUpdateOrderProduct();
+              }
+            }}
+          />
+        ) : (
+          <span onDoubleClick={handleDoubleClickChangeProduct?.bind(null, record, changeDiscountRef)}>
+            {record?.prices?.selling?.discount}%
+          </span>
+        )),
+    },
+    {
+      key: 'totalCost',
+      dataIndex: 'totalCost',
+      title: 'Chegirmadagi narxi',
+      align: 'center',
+      render: (value, record) => (
+        <span>
+          {record?.prices?.selling?.price * (100 - record?.prices?.selling?.discount) / 100}
+          {currencyTagUi(record?.prices?.selling?.currency?.symbol)}
+        </span>
+      ),
+    },
+    {
       key: 'totalCost',
       dataIndex: 'totalCost',
       title: 'Jami narxi',
       align: 'center',
       render: (value, record) => (
-        <span>{record?.prices?.selling?.totalPrice}{currencyTagUi(record?.prices?.selling?.currency?.symbol)}</span>
+        <span>
+          {record?.prices?.selling?.totalPrice}
+          {currencyTagUi(record?.prices?.selling?.currency?.symbol)}
+        </span>
       ),
     },
     {
@@ -815,10 +862,16 @@ export const AddEditModal = observer(() => {
           />
         </Form.Item>
         <Form.Item
-          name="sendUser"
+          label="Chegirma qiymati %"
+          rules={[{ required: true }]}
+          name="discount"
           className={cn('form__row')}
         >
-          <Checkbox onChange={handleChagneCheckbox}>Mijozga bu sotuv haqida yuborilsinmi?</Checkbox>
+          <InputNumber
+            placeholder="Chegirma qiymatini kiriting"
+            style={{ width: '100%' }}
+            formatter={(value) => priceFormat(value!)}
+          />
         </Form.Item>
         <Button
           onClick={handleCreateOrUpdateOrder}

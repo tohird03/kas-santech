@@ -51,10 +51,12 @@ export interface IOrderProducts {
       price: number;
       totalPrice: number;
       currency: ICurrency;
+      discount: number;
     };
   };
   avarage_cost: number;
   product: IProducts;
+  discount: number;
 }
 
 export interface IOrderProductUpdate {
@@ -63,6 +65,7 @@ export interface IOrderProductUpdate {
   price: number;
   avarage_cost: number;
   product: IProducts;
+  discount: number;
 }
 
 export interface IAddOrderProducts {
@@ -70,6 +73,7 @@ export interface IAddOrderProducts {
   count: number;
   price: number;
   currencyId: string;
+  discount?: number;
 }
 
 export interface IAddOrderModalForm extends IAddOrderProducts {
@@ -127,6 +131,7 @@ export interface IUpdateOrderProduct {
   id: string;
   count: number;
   price: number;
+  discount: number;
 }
 
 export interface ITotalOrderPaymentCalc {
