@@ -863,7 +863,6 @@ export const AddEditModal = observer(() => {
         </Form.Item>
         <Form.Item
           label="Chegirma qiymati %"
-          rules={[{ required: true }]}
           name="discount"
           className={cn('form__row')}
         >
