@@ -6,6 +6,7 @@ import { getFullDateFormat } from '@/utils/getDateFormat';
 import LogoImg from '../../../../../../public/images/kas-logo.png';
 import CheckmarkIcon from '@/assets/img/check-mark.png';
 import { phoneFormat } from '@/utils/phoneFormat';
+import { fixEncoding } from './utils';
 
 Font.register({
   family: 'NotoSans',
@@ -59,7 +60,9 @@ export const MyDocument = forwardRef<any, Props>(({ order }, ref) => (
             order?.products?.map((product, index) => (
               <View key={product?.id} style={styles.tableRow}>
                 <Text style={{ ...styles.tableCell, maxWidth: '30px' }}>{index + 1}</Text>
-                <Text style={{ ...styles.tableCell, maxWidth: '250px', minWidth: '250px', textAlign: 'left' }}>{product?.product?.name}</Text>
+                <Text style={{ ...styles.tableCell, maxWidth: '250px', minWidth: '250px', textAlign: 'left' }}>
+                  {fixEncoding(product?.product?.name)}
+                </Text>
                 <Text style={{ ...styles.tableCell, maxWidth: '35px' }} />
                 <Text style={{ ...styles.tableCell, maxWidth: '45px' }}>{product?.count}</Text>
                 <Text style={{ ...styles.tableCell, ...styles.tablePriceCol }}>
@@ -180,6 +183,7 @@ const styles = StyleSheet.create({
     padding: 3,
     borderRightWidth: 1,
     borderColor: 'black',
+    fontFamily: 'NotoSans',
     fontSize: 9,
   },
   tablePriceCol: {
