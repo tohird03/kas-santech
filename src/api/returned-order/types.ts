@@ -18,7 +18,6 @@ export interface IReturnedOrder {
   createdAt: string,
   date: string,
   client: IClientsInfo,
-  returnedDate: string,
   staff: ISeller,
   products: IReturnedOrderProducts[],
   totalPrices: IReturnedOrderTotalPrice[];
