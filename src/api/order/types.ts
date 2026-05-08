@@ -12,7 +12,7 @@ export interface IOrder {
   status: IOrderStatus;
   date: string;
   articl: number;
-
+  description: string;
   debtByCurrency: {
     amount: number;
     currency: ICurrency;
@@ -50,8 +50,8 @@ export interface IOrderProducts {
     selling: {
       price: number;
       totalPrice: number;
-      currency: ICurrency;
       discount: number;
+      currency: ICurrency;
     };
   };
   avarage_cost: number;
@@ -63,22 +63,23 @@ export interface IOrderProductUpdate {
   id: string;
   count: number;
   price: number;
+  discount: number;
   avarage_cost: number;
   product: IProducts;
-  discount: number;
 }
 
 export interface IAddOrderProducts {
   productId: string;
   count: number;
   price: number;
+  discount: number;
   currencyId: string;
-  discount?: number;
 }
 
 export interface IAddOrderModalForm extends IAddOrderProducts {
   clientId: string;
   date: string;
+  description: string;
 }
 
 export interface IAddOrder {
@@ -87,6 +88,7 @@ export interface IAddOrder {
   send: boolean;
   status?: IOrderStatus;
   products: IAddOrderProducts[];
+  description?: string;
 }
 
 export interface IUpdateOrder {
@@ -96,6 +98,7 @@ export interface IUpdateOrder {
   status?: IOrderStatus;
   send: boolean;
   payment?: IOrderPayment;
+  description?: string;
 }
 
 export interface IOrderPayment {
@@ -135,11 +138,7 @@ export interface IUpdateOrderProduct {
 }
 
 export interface ITotalOrderPaymentCalc {
-  totalPrice: number | null;
-  totalPayment: number | null;
-  totalCardPayment: number | null;
-  totalCashPayment: number | null;
-  totalOtherPayment: number | null;
-  totalTransferPayment: number | null;
-  totalDebt: number | null;
+  totalPrices: IOrderTotalPrice[];
+  totalPayments: IOrderTotalPrice[];
+  totalDebts: IOrderTotalPrice[];
 }

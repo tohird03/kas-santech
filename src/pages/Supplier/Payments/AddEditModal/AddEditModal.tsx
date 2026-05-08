@@ -15,9 +15,6 @@ import { IAddEditPaymentForm, IAddEditPaymentParams } from '@/api/payment-income
 import { incomePaymentApi } from '@/api/payment-income';
 import { addNotification } from '@/utils';
 
-const filterOption = (input: string, option?: { label: string, value: string }) =>
-  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
 export const AddEditModal = observer(() => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -71,7 +68,7 @@ export const AddEditModal = observer(() => {
     // KASSADAN BERISH
     if (values.uzsChange > 0) {
       changeMethods.push({
-        type: 'balance',
+        type: 'cash',
         amount: values.uzsChange,
         currencyId: currencyMany.data.find(c => c.symbol === 'UZS')!.id,
       });
@@ -79,7 +76,7 @@ export const AddEditModal = observer(() => {
 
     if (values.usdChange > 0) {
       changeMethods.push({
-        type: 'balance',
+        type: 'cash',
         amount: values.usdChange,
         currencyId: currencyMany.data.find(c => c.symbol === 'USD')!.id,
       });
@@ -88,7 +85,7 @@ export const AddEditModal = observer(() => {
     // MIJOZ HISOBIDAN AYIRISH
     if (values.uzsCash > 0) {
       changeMethods.push({
-        type: 'cash',
+        type: 'balance',
         amount: values.uzsCash,
         currencyId: currencyMany.data.find(c => c.symbol === 'UZS')!.id,
       });
@@ -96,7 +93,7 @@ export const AddEditModal = observer(() => {
 
     if (values.usdCash > 0) {
       changeMethods.push({
-        type: 'cash',
+        type: 'balance',
         amount: values.usdCash,
         currencyId: currencyMany.data.find(c => c.symbol === 'USD')!.id,
       });
@@ -344,6 +341,7 @@ export const AddEditModal = observer(() => {
           justifyContent: 'space-between',
           padding: '30px',
         }}
+        className="order__payment-wrapper"
       >
         <Form
           form={form}
@@ -370,9 +368,8 @@ export const AddEditModal = observer(() => {
               showSearch
               placeholder="Yetkazib beruvchi"
               loading={loadingClients}
-              optionFilterProp="children"
               notFoundContent={loadingClients ? <Spin style={{ margin: '10px' }} /> : null}
-              filterOption={filterOption}
+              filterOption={false}
               onSearch={handleSearchSupplier}
               onClear={handleClearClient}
               onChange={(value) => {
@@ -475,7 +472,7 @@ export const AddEditModal = observer(() => {
           <div>
             {(settlement.change.uzs > 0 || settlement.change.usd > 0) && (
               <div style={{ marginTop: 20 }}>
-                <h3>Hisobimizdan</h3>
+                <h3>Kassadan</h3>
 
                 {settlement.change.uzs > 0 && (
                   <Form.Item
@@ -508,7 +505,7 @@ export const AddEditModal = observer(() => {
             )}
 
             {uzsChange < settlement.change.uzs && (
-              <Form.Item name="uzsCash" label="Kassadan ayirish UZS">
+              <Form.Item name="uzsCash" label="Mijoz hisobidan ayirish UZS">
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}
@@ -520,7 +517,7 @@ export const AddEditModal = observer(() => {
             )}
 
             {settlement.change.usd > 0 && usdChange < settlement.change.usd && (
-              <Form.Item name="usdCash" label="Kassadan ayirish USD">
+              <Form.Item name="usdCash" label="Mijoz hisobidan ayirish USD">
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}

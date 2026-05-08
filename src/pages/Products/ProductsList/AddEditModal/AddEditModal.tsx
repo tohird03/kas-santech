@@ -92,7 +92,7 @@ export const AddEditModal = observer(() => {
 
     // 🔥 qolgan fieldlar (string bo‘lishi kerak)
     formData.append('name', values?.name);
-    formData.append('count', '0');
+    formData.append('count', String(values?.count));
     formData.append('minAmount', String(values?.minAmount || 0));
     formData.append('description', values?.description || '');
 
@@ -140,6 +140,7 @@ export const AddEditModal = observer(() => {
       form.setFieldsValue({
         ...productsListStore.singleProduct,
         cost: productsListStore?.singleProduct?.prices?.cost?.price,
+        count: productsListStore?.singleProduct?.count,
         price: productsListStore?.singleProduct?.prices?.selling?.price,
         wholesale: productsListStore?.singleProduct?.prices?.wholesale?.price,
         costCurrency: productsListStore?.singleProduct?.prices?.cost?.currency?.id,
@@ -209,6 +210,17 @@ export const AddEditModal = observer(() => {
           <Input placeholder="Mahsulot nomi" />
         </Form.Item>
         <Form.Item
+          label="Mahsulot soni"
+          rules={[{ required: true }]}
+          name="count"
+        >
+          <InputNumber
+            placeholder="Qoldiq mahsulot"
+            style={{ width: '100%' }}
+            formatter={(value) => priceFormat(value!)}
+          />
+        </Form.Item>
+        <Form.Item
           label="Ogohlantiruvchi qoldiq"
           name="minAmount"
         >
@@ -253,7 +265,6 @@ export const AddEditModal = observer(() => {
             placeholder="Mahsulot haqida ma'lumot"
             style={{ width: '100%' }}
             rows={4}
-            maxLength={100}
             showCount
             autoSize={{ minRows: 2, maxRows: 6 }}
           />

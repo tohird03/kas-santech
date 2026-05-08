@@ -15,7 +15,7 @@ import styles from './login.scss';
 import 'react-phone-input-2/lib/style.css';
 // @ts-ignore
 import PhoneInput from 'react-phone-input-2';
-import KasImg from '/public/images/kas-logo.png';
+import JasImg from '/public/images/kas-logo.png';
 
 const cn = classNames.bind(styles);
 
@@ -105,7 +105,7 @@ c20 28 41 50 45 50 3 0 23 -17 42 -37z"
               />
             </g>
           </svg> */}
-          <img src={KasImg} alt="" />
+          <img src={JasImg} alt="" />
         </div>
         <div className={cn('login__form-wrapper')}>
           <Form

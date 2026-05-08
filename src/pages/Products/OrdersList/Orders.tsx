@@ -228,12 +228,13 @@ export const Orders = observer(() => {
       <div>
         <DataTable
           columns={ordersTotalCalc}
-          data={[ordersData?.data?.calc || {}]}
+          data={[ordersData?.data?.calcPage || {}]}
           isMobile
           loading={loading}
           cardStyle={{ width: '500px' }}
           className="total-calc"
           loadingLength={1}
+          rowKey="1"
         />
       </div>
 

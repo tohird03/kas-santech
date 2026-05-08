@@ -1,5 +1,5 @@
 export const formatPhoneNumber = (phoneNumber?: string | number | null) => {
-  if (!phoneNumber) return '';
+  if (!phoneNumber) return '998000000000';
 
   const cleaned = String(phoneNumber);
 
@@ -10,7 +10,6 @@ export const formatPhoneNumber = (phoneNumber?: string | number | null) => {
 
   return formattedNumber;
 };
-
 
 export function phoneFormat(input: string | number | undefined) {
   if (!input) {

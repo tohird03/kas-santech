@@ -15,9 +15,6 @@ import { clientsPaymentApi } from '@/api/payment';
 import { addNotification } from '@/utils';
 import { IAddEditPaymentForm, IAddEditPaymentParams } from '@/api/payment/types';
 
-const filterOption = (input: string, option?: { label: string, value: string }) =>
-  (option?.label ?? '').toLowerCase().includes(input.toLowerCase());
-
 export const AddEditModal = observer(() => {
   const [form] = Form.useForm();
   const queryClient = useQueryClient();
@@ -336,6 +333,7 @@ export const AddEditModal = observer(() => {
           justifyContent: 'space-between',
           padding: '30px',
         }}
+        className="order__payment-wrapper"
       >
         <Form
           form={form}
@@ -362,9 +360,8 @@ export const AddEditModal = observer(() => {
               showSearch
               placeholder="Mijoz"
               loading={loadingClients}
-              optionFilterProp="children"
               notFoundContent={loadingClients ? <Spin style={{ margin: '10px' }} /> : null}
-              filterOption={filterOption}
+              filterOption={false}
               onSearch={handleSearchClients}
               onClear={handleClearClient}
               onChange={(value) => {
@@ -467,7 +464,7 @@ export const AddEditModal = observer(() => {
           <div>
             {(settlement.change.uzs > 0 || settlement.change.usd > 0) && (
               <div style={{ marginTop: 20 }}>
-                <h3>Mijoz hisobidan</h3>
+                <h3>Mijoz hisobidan ayirish</h3>
 
                 {settlement.change.uzs > 0 && (
                   <Form.Item

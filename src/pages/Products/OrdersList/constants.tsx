@@ -2,12 +2,14 @@ import React from 'react';
 import { ColumnType } from 'antd/es/table';
 import { Action } from './Action';
 import { IOrder, IOrderProducts, IOrderStatus, ITotalOrderPaymentCalc } from '@/api/order/types';
-import { Tag } from 'antd';
+import { Image, Tag } from 'antd';
 import { getFullDateFormat } from '@/utils/getDateFormat';
 import { priceFormat } from '@/utils/priceFormat';
 import { ClientNameLink } from '@/pages/ActionComponents/ClientNameLink';
 import { PaymentStatus } from './PaymentStatus';
 import { currencyTagUi } from '@/constants/payment';
+import { imageUrlWithBase } from '@/utils/image';
+import { OrderDescUpdate } from './OrderDescUpdate/OrderDescUpdate';
 
 export const ordersColumns: ColumnType<IOrder>[] = [
   {
@@ -15,7 +17,7 @@ export const ordersColumns: ColumnType<IOrder>[] = [
     dataIndex: 'index',
     title: '#',
     align: 'center',
-    width: '150px',
+    width: '100px',
     render: (value, record, index) => index + 1,
   },
   {
@@ -53,7 +55,7 @@ export const ordersColumns: ColumnType<IOrder>[] = [
     dataIndex: 'seller',
     title: 'Sotuvchi',
     align: 'center',
-    width: '150px',
+    width: '100px',
     render: (value, record) => <p style={{ margin: 0, fontWeight: 'bold' }}>{record?.staff?.fullname}</p>,
   },
   {
@@ -138,6 +140,14 @@ export const ordersColumns: ColumnType<IOrder>[] = [
     align: 'center',
     width: '150px',
     render: (value, record) => getFullDateFormat(record?.date),
+  },
+  {
+    key: 'description',
+    dataIndex: 'description',
+    title: 'Ma\'lumot',
+    align: 'center',
+    width: '200px',
+    render: (value, record) => <OrderDescUpdate order={record} />,
   },
   {
     key: 'action',
@@ -310,6 +320,20 @@ export const ordersInfoProductsColumns: ColumnType<IOrderProducts>[] = [
     render: (value, record, index) => index + 1,
   },
   {
+    key: 'image',
+    dataIndex: 'image',
+    title: 'Mahsulot rasmi',
+    align: 'center',
+    width: '150px',
+    render: (value, record) => (
+      <Image
+        width={50}
+        alt="basic"
+        src={imageUrlWithBase(record?.product?.image)}
+      />
+    ),
+  },
+  {
     key: 'name',
     dataIndex: 'name',
     title: 'Mahsulot nomi',
@@ -332,7 +356,10 @@ export const ordersInfoProductsColumns: ColumnType<IOrderProducts>[] = [
     align: 'center',
     width: '150px',
     render: (value, record) => (
-      <span>{priceFormat(record?.prices?.selling?.price)}{currencyTagUi(record?.prices?.selling?.currency?.symbol)}</span>
+      <span>
+        {priceFormat(record?.prices?.selling?.price * (100 - record?.prices?.selling?.discount) / 100)}
+        {currencyTagUi(record?.prices?.selling?.currency?.symbol)}
+      </span>
     ),
   },
   {
@@ -363,7 +390,24 @@ export const ordersTotalCalc: ColumnType<ITotalOrderPaymentCalc>[] = [
     title: 'Jami narxi',
     align: 'center',
     width: '150px',
-    render: (value, record) => priceFormat(record?.totalPrice),
+    render: (value, record) => {
+      const data = record?.totalPrices;
+
+      if (!data || data.length === 0) {
+        return <div>0</div>;
+      }
+
+      return (
+        <div style={{textAlign: 'end'}}>
+          {data.map(price => (
+            <div key={price?.currency?.id}>
+              {priceFormat(price?.total)}
+              {currencyTagUi(price?.currency?.symbol)}
+            </div>
+          ))}
+        </div>
+      );
+    },
   },
   {
     key: 'totalPay',
@@ -371,7 +415,24 @@ export const ordersTotalCalc: ColumnType<ITotalOrderPaymentCalc>[] = [
     title: 'Jami to\'lov',
     align: 'center',
     width: '150px',
-    render: (value, record) => priceFormat(record?.totalPayment),
+    render: (value, record) => {
+      const data = record?.totalPayments;
+
+      if (!data || data.length === 0) {
+        return <div>0</div>;
+      }
+
+      return (
+        <div style={{textAlign: 'end'}}>
+          {data.map(price => (
+            <div key={price?.currency?.id}>
+              {priceFormat(price?.total)}
+              {currencyTagUi(price?.currency?.symbol)}
+            </div>
+          ))}
+        </div>
+      );
+    },
   },
   {
     key: 'debt',
@@ -379,7 +440,24 @@ export const ordersTotalCalc: ColumnType<ITotalOrderPaymentCalc>[] = [
     title: 'Jami - Qarzga',
     align: 'center',
     width: '150px',
-    render: (value, record) => priceFormat(record?.totalDebt),
+    render: (value, record) => {
+      const data = record?.totalDebts;
+
+      if (!data || data.length === 0) {
+        return <div>0</div>;
+      }
+
+      return (
+        <div style={{textAlign: 'end'}}>
+          {data.map(price => (
+            <div key={price?.currency?.id}>
+              {priceFormat(price?.total)}
+              {currencyTagUi(price?.currency?.symbol)}
+            </div>
+          ))}
+        </div>
+      );
+    },
   },
 ];
 

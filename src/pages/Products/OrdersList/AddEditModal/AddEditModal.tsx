@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { observer } from 'mobx-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Checkbox, DatePicker, Form, InputNumber, Modal, Popconfirm, Select, Space, Spin, Tag } from 'antd';
+import { Button, Checkbox, DatePicker, Form, Image, Input, InputNumber, Modal, Popconfirm, Select, Space, Spin, Tag } from 'antd';
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { ordersStore, productsListStore } from '@/stores/products';
@@ -29,6 +29,8 @@ import { getFullDateFormat } from '@/utils/getDateFormat';
 import { PriceWithCurrency } from '@/utils/hooks/valuteConversition';
 import { authStore } from '@/stores/auth';
 import { currencyTagUi } from '@/constants/payment';
+import { imageUrlWithBase } from '@/utils/image';
+import { IProducts } from '@/api/product/types';
 
 const cn = classNames.bind(styles);
 
@@ -54,10 +56,11 @@ export const AddEditModal = observer(() => {
   const clientRef = useRef<any>(null);
   const { clientId } = useParams();
   const changeCostRef = useRef<any>(null);
-  const changeDiscountRef = useRef<any>(null);
   const changeCountRef = useRef<any>(null);
+  const changeDiscountRef = useRef<any>(null);
   const [selectedClient, setSelectedClient] = useState<IClientsInfo | null>(null);
   const [priceType, setPriceType] = useState<'cost' | 'wholesale' | 'selling'>('selling');
+  const [selectedProduct, setSelectedProduct] = useState<IProducts | null>(null);
 
   // GET DATAS
   const { data: clientsData, isLoading: loadingClients } = useQuery({
@@ -71,12 +74,13 @@ export const AddEditModal = observer(() => {
   });
 
   const { data: productsData, isLoading: loadingProducts } = useQuery({
-    queryKey: ['getProducts', searchProducts],
+    queryKey: ['getProducts', searchProducts, selectedClient?.id],
     queryFn: () =>
       productsListStore.getProducts({
         pageNumber: 1,
-        pageSize: 50,
+        pageSize: 15,
         search: searchProducts!,
+        clientId: selectedClient?.id,
       }),
   });
 
@@ -104,8 +108,9 @@ export const AddEditModal = observer(() => {
     ordersApi.updateOrder({
       status: IOrderStatus.ACCEPTED,
       id: ordersStore?.order?.id!,
-      send: true,
+      send: ordersStore.isSendUser,
       clientId: form.getFieldValue('clientId'),
+      description: form.getFieldValue('description'),
     })
       .then(() => {
         queryClient.invalidateQueries({ queryKey: ['getOrders'] });
@@ -189,6 +194,7 @@ export const AddEditModal = observer(() => {
       clientId: values?.clientId,
       date: values?.date,
       send: false,
+      description: values?.description,
       products: [addProducts],
     };
 
@@ -229,6 +235,7 @@ export const AddEditModal = observer(() => {
     ordersStore.setOrder(null);
     ordersStore.setIsSendUser(false);
     ordersStore.setIsOpenAddEditNewOrderModal(false);
+    productsListStore.setSingleProduct(null);
   };
 
   // SEARCH OPTIONS
@@ -260,35 +267,37 @@ export const AddEditModal = observer(() => {
     if (findProduct) {
       form.setFieldValue('price', findProduct.prices[priceType]?.price);
       form.setFieldValue('currencyId', findProduct.prices[priceType]?.currency?.id);
+
+      setSelectedProduct(findProduct);
     }
 
     setIsOpenProductSelect(false);
     countInputRef.current?.focus();
   };
 
+  const handleEditProductSelectedProduct = () => {
+    productsListStore.setSingleProduct(selectedProduct);
+    productsListStore.setIsOpenAddEditProductModal(true);
+  };
+
   const handleClearClient = () => {
     setSearchClients(null);
   };
 
-  const supplierOptions = useMemo(() => (
-    clientsData?.data?.data.map((supplier) => ({
-      value: supplier?.id,
-      label: `${supplier?.fullname}: +${supplier?.phone}`,
-    }))
-  ), [clientsData]);
-
   useEffect(() => {
     if (ordersStore.singleOrder && ordersStore?.order) {
-      setSearchClients(ordersStore?.order?.client?.phone);
+      setSearchClients(ordersStore?.order?.client?.fullname);
       setSelectedClient(ordersStore?.order?.client);
 
       form.setFieldsValue({
         date: dayjs(ordersStore.order?.date),
         clientId: ordersStore?.order?.client?.id,
+        description: ordersStore?.order?.description,
       });
 
     } else if (singleClientStore.activeClient?.id) {
-      setSearchClients(singleClientStore.activeClient?.phone);
+      setSelectedClient(singleClientStore.activeClient);
+      setSearchClients(singleClientStore.activeClient?.fullname);
       form.setFieldValue('clientId', singleClientStore.activeClient?.id);
     }
   }, [ordersStore.order, singleClientStore.activeClient]);
@@ -385,6 +394,20 @@ export const AddEditModal = observer(() => {
       render: (value, record, index) => index + 1,
     },
     {
+      key: 'image',
+      dataIndex: 'image',
+      title: 'Mahsulot rasmi',
+      align: 'center',
+      width: '150px',
+      render: (value, record) => (
+        <Image
+          width={50}
+          alt="basic"
+          src={imageUrlWithBase(record?.product?.image)}
+        />
+      ),
+    },
+    {
       key: 'product_name',
       dataIndex: 'product_name',
       title: 'Mahsulot nomi',
@@ -470,7 +493,7 @@ export const AddEditModal = observer(() => {
       align: 'center',
       render: (value, record) => (
         <span>
-          {record?.prices?.selling?.price * (100 - record?.prices?.selling?.discount) / 100}
+          {priceFormat(record?.prices?.selling?.price * (100 - record?.prices?.selling?.discount) / 100)}
           {currencyTagUi(record?.prices?.selling?.currency?.symbol)}
         </span>
       ),
@@ -481,10 +504,7 @@ export const AddEditModal = observer(() => {
       title: 'Jami narxi',
       align: 'center',
       render: (value, record) => (
-        <span>
-          {record?.prices?.selling?.totalPrice}
-          {currencyTagUi(record?.prices?.selling?.currency?.symbol)}
-        </span>
+        <span>{record?.prices?.selling?.totalPrice}{currencyTagUi(record?.prices?.selling?.currency?.symbol)}</span>
       ),
     },
     {
@@ -651,6 +671,39 @@ export const AddEditModal = observer(() => {
     })) || []
   ), [currencyMany]);
 
+  useEffect(() => {
+    if (selectedProduct) {
+      const selectedPrice = selectedProduct?.prices?.[priceType];
+
+      form.setFieldsValue({
+        price: selectedPrice?.price,
+        currencyId: selectedPrice?.currency?.id,
+      });
+    }
+  }, [priceType, selectedProduct]);
+
+  useEffect(() => {
+    if (selectedProduct && productsData?.data?.data) {
+      const updated = productsData.data.data.find(
+        p => p.id === selectedProduct.id
+      );
+
+      if (updated) {
+        setSelectedProduct(updated);
+      }
+    }
+  }, [productsData]);
+
+  const price = Form.useWatch('price', form);
+  const count = Form.useWatch('count', form);
+  const discount = Form.useWatch('discount', form) || 0;
+
+  const totalPrice = useMemo(() => {
+    if (!price || !count) return 0;
+
+    return price * count * (100 - discount) / 100;
+  }, [price, count, discount]);
+
   return (
     <Modal
       open={ordersStore.isOpenAddEditNewOrderModal}
@@ -659,13 +712,22 @@ export const AddEditModal = observer(() => {
         <div className={cn('order__add-products-header')}>
           <div className={cn('order__add-products-header-left')}>
             {ordersStore?.order?.id ? 'Sotuvni tahrirlash' : 'Yangi sotuv'}
-            <p style={{ margin: 0 }}>{selectedClient &&
-              `Mijoz qarzi:
-        ${ordersStore?.order?.client?.debtByCurrency?.map(debt => (
-          <span key={debt?.currency?.id}>
-            {debt?.amount}{currencyTagUi(debt?.currency?.symbol)}
-          </span>
-        ))}`}
+            <p style={{ margin: 0 }}>
+              {selectedClient && (
+                <>
+                  Mijoz qarzi:{' '}
+                  {selectedClient?.debtByCurrency?.length ? (
+                    selectedClient.debtByCurrency.map(debt => (
+                      <span key={debt?.currency?.id} style={{ marginRight: '8px' }}>
+                        {priceFormat(debt?.amount)}
+                        {currencyTagUi(debt?.currency?.symbol)}
+                      </span>
+                    ))
+                  ) : (
+                    '0'
+                  )}
+                </>
+              )}
             </p>
             {ordersStore?.order?.id && (
               <Button
@@ -726,9 +788,8 @@ export const AddEditModal = observer(() => {
         className="order__add-products-form"
         onKeyPress={handleKeyPress}
       >
-        <div className={cn('form__row')} style={{ display: 'flex', alignItems: 'center' }}>
+        <div className={cn('form__row')} style={{ display: 'flex' }}>
           <Form.Item
-            label="Mijoz"
             rules={[{ required: true }]}
             name="clientId"
             style={{ flex: 1, width: '100%' }}
@@ -739,13 +800,10 @@ export const AddEditModal = observer(() => {
               ref={clientRef}
               placeholder="Mijoz"
               loading={loadingClients}
-              optionFilterProp="children"
               notFoundContent={loadingClients ? <Spin style={{ margin: '10px' }} /> : null}
-              filterOption={filterOption}
+              filterOption={false}
               onSearch={handleSearchSupplier}
               onClear={handleClearClient}
-              // @ts-ignore
-              options={supplierOptions}
               onChange={(value) => {
                 const client = clientsData?.data?.data?.find((client) => client.id === value);
 
@@ -756,12 +814,37 @@ export const AddEditModal = observer(() => {
               onSelect={(value) => handleSelectChange(value, 'clientId')}
               allowClear
               style={{ flex: 1, width: '100%' }}
-            />
+            >
+              {clientsData?.data?.data.map((client) => (
+                <Select.Option key={client.id} value={client.id}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div>
+                      <div style={{ fontWeight: 600 }}>
+                        {client.fullname}
+                      </div>
+                      <div style={{ fontSize: 12, color: '#999' }}>
+                        {client.phone}
+                      </div>
+
+                    </div>
+                    <div>
+                      {client.debtByCurrency?.length
+                        ? client.debtByCurrency.map((debt) => (
+                          <span key={debt.currency?.id} style={{ marginRight: 6 }}>
+                            {priceFormat(debt.amount)}
+                            {currencyTagUi(debt.currency?.symbol)}
+                          </span>
+                        ))
+                        : '0'}
+                    </div>
+                  </div>
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Button style={{ marginTop: '5px' }} onClick={handleAddClient} icon={<PlusOutlined />} />
+          <Button onClick={handleAddClient} icon={<PlusOutlined />} />
         </div>
         <Form.Item
-          label="Sotish sanasi"
           name="date"
           initialValue={dayjs()}
           className={cn('form__row')}
@@ -773,12 +856,22 @@ export const AddEditModal = observer(() => {
             onChange={handleChaneOrderDate}
           />
         </Form.Item>
-        <div className={cn('form__row')} style={{ display: 'flex', alignItems: 'center' }}>
+        <div className={cn('form__row')} style={{ display: 'flex' }}>
           <Form.Item
-            label="Mahsulot"
             rules={[{ required: true }]}
             name="productId"
             style={{ flex: 1, width: '100%' }}
+            help={
+              selectedProduct?.lastSelling ? (
+                <span>
+                  Oxirgi sotuv:{' '}
+                  {priceFormat(selectedProduct.lastSelling?.price || 0)}
+                  {currencyTagUi(selectedProduct?.prices?.selling?.currency?.symbol)}x{' '}
+                  {selectedProduct.lastSelling?.count} dona | {' '}
+                  {getFullDateFormat(selectedProduct.lastSelling?.date)}
+                </span>
+              ) : ''
+            }
           >
             <Select
               showSearch
@@ -804,9 +897,14 @@ export const AddEditModal = observer(() => {
                 >
                   <div className={cn('order__add-select-option')}>
                     <div className={cn('income-order__add-product-option')}>
-                      <p className={cn('income-order__add-product-name')}>
-                        {product?.name}
-                      </p>
+                      <div>
+                        <p className={cn('income-order__add-product-name')}>
+                          {product?.name}
+                        </p>
+                        <p className={cn('order__add-product-desc')}>
+                          {product?.description}
+                        </p>
+                      </div>
                       <div className={cn('income-order__add-product-info')}>
                         <p className={cn('income-order__add-product-price')}>
                           {priceFormat(product?.prices?.selling?.price)} {currencyTagUi(product?.prices?.selling?.currency?.symbol)}
@@ -819,35 +917,71 @@ export const AddEditModal = observer(() => {
                         </p>
                       </div>
                     </div>
-                    <p className={cn('order__add-product-desc')}>
-                      {product?.description}
-                    </p>
                   </div>
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
-          <Button style={{ marginTop: '5px' }} onClick={handleAddProduct} icon={<PlusOutlined />} />
-        </div>
-        <PriceWithCurrency
-          form={form}
-          valueName="price"
-          currencyName="currencyId"
-          label="Sotish narxi"
-          required
-          onKeyDown={handleChangePriceForm}
-          currencyOptions={currencyManyData}
-          addonBefore={
-            <Select
-              style={{ width: '30%' }}
-              options={PRICE_TYPE_OPTIONS}
-              value={priceType}
-              onChange={(val) => {
-                setPriceType(val);
+          <Button onClick={handleAddProduct} icon={<PlusOutlined />} />
+          <Button onClick={handleEditProductSelectedProduct} icon={<EditOutlined />} />
+          {selectedProduct?.image && (
+            <Image
+              src={imageUrlWithBase(selectedProduct.image)}
+              alt="product"
+              style={{
+                width: 50,
+                height: 50,
+                objectFit: 'cover',
+                borderRadius: 8,
+                border: '1px solid #ddd',
               }}
             />
-          }
-        />
+          )}
+        </div>
+        <Form.Item
+          name="description"
+        >
+          <Input.TextArea
+            placeholder="Sotuv haqida ma'lumot"
+            rows={4}
+            showCount
+            autoSize={{ minRows: 2, maxRows: 6 }}
+          />
+        </Form.Item>
+        <div>
+          <PriceWithCurrency
+            form={form}
+            valueName="price"
+            currencyName="currencyId"
+            label=""
+            required
+            onKeyDown={handleChangePriceForm}
+            currencyOptions={currencyManyData}
+            addonBefore={
+              <Select
+                style={{ width: '30%' }}
+                options={PRICE_TYPE_OPTIONS}
+                value={priceType}
+                onChange={(val) => {
+                  setPriceType(val);
+                }}
+              />
+            }
+          />
+
+        </div>
+        <Form.Item
+          label="Chegirma qiymati %"
+          name="discount"
+          className={cn('form__row')}
+          initialValue={0}
+        >
+          <InputNumber
+            placeholder="Chegirma qiymatini kiriting"
+            style={{ width: '100%' }}
+            formatter={(value) => priceFormat(value!)}
+          />
+        </Form.Item>
         <Form.Item
           label="Mahsulot soni"
           rules={[{ required: true }]}
@@ -861,26 +995,25 @@ export const AddEditModal = observer(() => {
             formatter={(value) => priceFormat(value!)}
           />
         </Form.Item>
-        <Form.Item
-          label="Chegirma qiymati %"
-          name="discount"
-          className={cn('form__row')}
-        >
-          <InputNumber
-            placeholder="Chegirma qiymatini kiriting"
-            style={{ width: '100%' }}
-            formatter={(value) => priceFormat(value!)}
-          />
-        </Form.Item>
-        <Button
-          onClick={handleCreateOrUpdateOrder}
-          type="primary"
-          icon={<PlusOutlined />}
-          loading={loading}
-          className={cn('form__row')}
-        >
-          Qo&apos;shish
-        </Button>
+        <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
+          <div style={{ fontSize: '18px', fontWeight: '700px', marginTop: '-10px', marginBottom: '10px', width: '300px' }}>
+            Umumiy narx: {priceFormat(totalPrice)}{' '}
+            {currencyTagUi(currencyManyData.find(c => c.value === form.getFieldValue('currencyId'))?.code!)}
+          </div>
+          <Form.Item
+            name="sendUser"
+          >
+            <Checkbox onChange={handleChagneCheckbox}>Mijozga bu sotuv haqida yuborilsinmi?</Checkbox>
+          </Form.Item>
+          <Button
+            onClick={handleCreateOrUpdateOrder}
+            type="primary"
+            icon={<PlusOutlined />}
+            loading={loading}
+          >
+            Qo&apos;shish
+          </Button>
+        </div>
       </Form>
 
       {/* PRODUCTS SHOW LIST */}

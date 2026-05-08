@@ -19,7 +19,6 @@ export const ClientNameLink = ({ client }: Props) => {
       <p style={{ margin: 0, fontWeight: 'bold', fontSize: '14px' }}>
         {client?.fullname}
       </p>
-      <i>{client?.phone}</i>
     </div>
   );
 };

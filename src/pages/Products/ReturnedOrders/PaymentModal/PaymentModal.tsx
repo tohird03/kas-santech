@@ -312,6 +312,7 @@ export const PaymentModal = observer(() => {
           justifyContent: 'space-between',
           padding: '30px',
         }}
+        className="order__payment-wrapper"
       >
         <Form
           form={form}
@@ -434,7 +435,7 @@ export const PaymentModal = observer(() => {
           <div>
             {(settlement.change.uzs > 0 || settlement.change.usd > 0) && (
               <div style={{ marginTop: 20 }}>
-                <h3>Mijoz hisobidan</h3>
+                <h3>Mijoz hisobidan ayirish</h3>
 
                 {settlement.change.uzs > 0 && (
                   <Form.Item
@@ -467,7 +468,7 @@ export const PaymentModal = observer(() => {
             )}
 
             {uzsChange < settlement.change.uzs && (
-              <Form.Item name="uzsCash" label="Kassadan ayirish UZS">
+              <Form.Item name="uzsCash" label="Kassadan berish UZS">
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}
@@ -479,7 +480,7 @@ export const PaymentModal = observer(() => {
             )}
 
             {settlement.change.usd > 0 && usdChange < settlement.change.usd && (
-              <Form.Item name="usdCash" label="Kassadan ayirish USD">
+              <Form.Item name="usdCash" label="Kassadan berish USD">
                 <InputNumber
                   style={{ width: '100%' }}
                   min={0}

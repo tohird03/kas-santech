@@ -7,6 +7,7 @@ import { ICurrency } from "../auth/types";
 
 export interface IGetProductsParams extends IPagination {
   search?: string;
+  clientId?: string;
 }
 
 
@@ -21,17 +22,23 @@ export interface IProducts {
     selling: IProductPrice,
     wholesale: IProductPrice,
   };
+  image: string,
   lastSellingDate: string;
   description: string;
+  lastSelling: {
+    date: string,
+    price: number,
+    count: number,
+  }
 }
 
 export interface IProductPrice {
-    id: string,
-    type: "cost" | "selling" | "wholesale",
-    price: number,
-    totalPrice: number,
-    currency: ICurrency,
-    exchangeRate: number,
+  id: string,
+  type: "cost" | "selling" | "wholesale",
+  price: number,
+  totalPrice: number,
+  currency: ICurrency,
+  exchangeRate: number,
 }
 
 export interface IAddEditProduct {
@@ -40,20 +47,13 @@ export interface IAddEditProduct {
   count: number,
   minAmount: number,
   description: string,
-  prices: {
-    cost: {
-      price: number,
-      currencyId: string,
-    },
-    selling: {
-      price: number,
-      currencyId: string,
-    },
-    wholesale: {
-      price: number,
-      currencyId: string,
-    }
-  }
+  image: any,
+  prices_cost_price: number;
+  prices_cost_currencyId: string;
+  prices_selling_price: number;
+  prices_selling_currencyId: string;
+  prices_wholesale_price: number;
+  prices_wholesale_currencyId: string;
 }
 
 export interface IAddEditProductForm {

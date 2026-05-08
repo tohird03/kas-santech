@@ -406,7 +406,7 @@ export const AddEditModal = observer(() => {
   const clientsOptions = useMemo(() => (
     clientsData?.data?.data.map((supplier) => ({
       value: supplier?.id,
-      label: `${supplier?.fullname}: +${supplier?.phone}`,
+      label: `${supplier?.fullname}: ${supplier?.phone || ''}`,
     }))
   ), [clientsData]);
 
@@ -488,9 +488,8 @@ export const AddEditModal = observer(() => {
             showSearch
             placeholder="Mijoz"
             loading={loadingClients}
-            optionFilterProp="children"
             notFoundContent={loadingClients ? <Spin style={{ margin: '10px' }} /> : null}
-            filterOption={filterOption}
+            filterOption={false}
             onSearch={handleSearchClients}
             onClear={handleClearClient}
             options={clientsOptions}
@@ -554,9 +553,11 @@ export const AddEditModal = observer(() => {
                       </p>
                     </div>
                   </div>
-                  <p className={cn('order__add-product-desc')}>
-                    {product?.description}
-                  </p>
+                  {product?.description && (
+                    <p className={cn('order__add-product-desc')}>
+                      {product?.description}
+                    </p>
+                  )}
                 </div>
               </Select.Option>
             ))}
@@ -604,10 +605,13 @@ export const AddEditModal = observer(() => {
       />
 
       <div>
-        <p style={{ textAlign: 'end', fontSize: '24px', fontWeight: 'bold' }}>Umumiy qiymati: {
-          priceFormat(returnedOrdersStore?.singleReturnedOrder?.products?.reduce((prev, current) => prev + (current?.price * current?.count), 0))
-        }
-        </p>
+        <div style={{ fontSize: '24px', fontWeight: 'bold', display: 'flex', justifyContent: 'flex-end', alignItems: 'flex-start', gap: '20px' }}>
+          <p style={{ margin: '0' }}>Umumiy qiymati:</p>
+          <div style={{ textAlign: 'end' }}>
+            {returnedOrdersStore?.singleReturnedOrder?.totalPrices?.map(price =>
+              <div key={price?.currencyId}>{priceFormat(price?.total)}{currencyTagUi(price?.currency?.symbol)}</div>)}
+          </div>
+        </div>
       </div>
     </Modal>
   );
