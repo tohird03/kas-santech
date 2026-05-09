@@ -817,7 +817,7 @@ export const AddEditModal = observer(() => {
             >
               {clientsData?.data?.data.map((client) => (
                 <Select.Option key={client.id} value={client.id}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>
                       <div style={{ fontWeight: 600 }}>
                         {client.fullname}
