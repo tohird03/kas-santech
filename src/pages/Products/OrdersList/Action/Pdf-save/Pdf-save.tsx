@@ -24,84 +24,162 @@ type Props = {
   order: IOrder;
 };
 
-export const MyDocument = forwardRef<any, Props>(({ order }, ref) => (
-  <Document ref={ref}>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <View style={styles.topData}>
-          <View style={styles.titleInfo}>
-            <View style={styles.title}>
-              <Text style={styles.titleSpan}>Дата продажа:</Text>
-              <Text style={styles.titleSpanData}>{getFullDateFormat(order?.date)}</Text>
-            </View>
-            <View style={styles.title}>
-              <Text style={styles.titleSpan}>Харидор:</Text>
-              <Text style={styles.titleSpanData}>{order?.client?.fullname}    {phoneFormat(order?.client?.phone?.slice(3))}</Text>
-            </View>
-          </View>
-          <View>
-            <Image style={styles.logoImage} src={LogoImg} />
-          </View>
-        </View>
+export const MyDocument = forwardRef<any, Props>(({ order }, ref) => {
+  const oldDebtByCurrency = order?.client?.debtByCurrency?.map(debt => {
+    const totalPrice =
+      order?.totalPrices?.find(
+        p => p.currencyId === debt.currency.id
+      )?.total || 0;
 
-        {/* Jadval */}
-        <View style={styles.table}>
-          <View style={styles.tableHeader}>
-            <Text style={{ ...styles.tableHeaderCell, maxWidth: '30px' }}>№</Text>
-            <Text style={{ ...styles.tableHeaderCell, maxWidth: '250', minWidth: '250' }}>Махсулот номи</Text>
-            <Text style={{ ...styles.tableHeaderCell, maxWidth: '35px' }}>
-              <Image src={CheckmarkIcon} style={{ width: 10, height: 10 }} />
-            </Text>
-            <Text style={{ ...styles.tableHeaderCell, maxWidth: '45px' }}>Сони</Text>
-            <Text style={{ ...styles.tableHeaderCell }}>Нархи</Text>
-            <Text style={{ ...styles.tableHeaderCell }}>Суммаси</Text>
-          </View>
-          {
-            order?.products?.map((product, index) => (
-              <View key={product?.id} style={styles.tableRow}>
-                <Text style={{ ...styles.tableCell, maxWidth: '30px' }}>{index + 1}</Text>
-                <Text style={{ ...styles.tableCell, maxWidth: '250px', minWidth: '250px', textAlign: 'left' }}>
-                  {fixEncoding(product?.product?.name)}
-                </Text>
-                <Text style={{ ...styles.tableCell, maxWidth: '35px' }} />
-                <Text style={{ ...styles.tableCell, maxWidth: '45px' }}>{product?.count}</Text>
-                <Text style={{ ...styles.tableCell, ...styles.tablePriceCol }}>
-                  {priceFormat(product?.prices?.selling?.price)} {(product?.prices?.selling?.currency?.symbol)}
-                </Text>
-                <Text style={{ ...styles.tableCell, ...styles.tablePriceCol }}>
-                  {priceFormat(product?.prices?.selling?.totalPrice)} {(product?.prices?.selling?.currency?.symbol)}
+    const totalPayment =
+      order?.totalPayments?.find(
+        p => p.currencyId === debt.currency.id
+      )?.total || 0;
+
+    const currentSaleDebt = totalPrice - totalPayment;
+
+    // tasdiqlangan bo'lsa ayiramiz
+    const isConfirmed = order?.status === 'accepted';
+
+    return {
+      currencyId: debt.currency.id,
+      symbol: debt.currency.symbol,
+      amount: isConfirmed
+        ? debt.amount - currentSaleDebt
+        : debt.amount,
+    };
+  });
+
+  return (
+    <Document ref={ref}>
+      <Page size="A4" style={styles.page}>
+        <View style={styles.section}>
+          <View style={styles.topData}>
+            <View style={styles.titleInfo}>
+              <View style={styles.title}>
+                <Text style={styles.titleSpan}>Mansur</Text>
+                <Text style={styles.titleSpanData}>
+                  +998 99 044 00 24
                 </Text>
               </View>
-            ))
-          }
+              <View style={styles.title}>
+                <Text style={styles.titleSpan}>Mamur</Text>
+                <Text style={styles.titleSpanData}>
+                  +998 90 863 69 91
+                </Text>
+              </View>
+            </View>
+            <View>
+              <Image style={styles.logoImage} src={LogoImg} />
+            </View>
+            <View style={styles.titleInfo}>
+              <View style={styles.title}>
+                <Text style={styles.titleSpan}>Харидор:</Text>
+                <Text style={styles.titleSpanData}>{order?.client?.fullname}    {phoneFormat(order?.client?.phone?.slice(3))}</Text>
+              </View>
+              <View style={styles.title}>
+                <Text style={styles.titleSpan}>Дата продажа:</Text>
+                <Text style={styles.titleSpanData}>{getFullDateFormat(order?.date)}</Text>
+              </View>
+              <View style={styles.title}>
+                <Text style={styles.titleSpan}>Эски карз:</Text>
+
+                <View style={styles.totalCalcPriceText}>
+                  {oldDebtByCurrency?.length ? (
+                    oldDebtByCurrency.map(price => (
+                      <Text key={price.currencyId}>
+                        {priceFormat(price.amount)} {price.symbol}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text>0</Text>
+                  )}
+                </View>
+              </View>
+            </View>
+          </View>
+
+          {/* Jadval */}
+          <View style={styles.table}>
+            <View style={styles.tableHeader}>
+              <Text style={{ ...styles.tableHeaderCell, maxWidth: '30px' }}>№</Text>
+              <Text style={{ ...styles.tableHeaderCell, maxWidth: '250', minWidth: '250' }}>Махсулот номи</Text>
+              <Text style={{ ...styles.tableHeaderCell, maxWidth: '35px' }}>
+                <Image src={CheckmarkIcon} style={{ width: 10, height: 10 }} />
+              </Text>
+              <Text style={{ ...styles.tableHeaderCell, maxWidth: '45px' }}>Сони</Text>
+              <Text style={{ ...styles.tableHeaderCell }}>Нархи</Text>
+              <Text style={{ ...styles.tableHeaderCell }}>Суммаси</Text>
+            </View>
+            {
+              order?.products?.map((product, index) => (
+                <View key={product?.id} style={styles.tableRow}>
+                  <Text style={{ ...styles.tableCell, maxWidth: '30px' }}>{index + 1}</Text>
+                  <Text style={{ ...styles.tableCell, maxWidth: '250px', minWidth: '250px', textAlign: 'left' }}>
+                    {fixEncoding(product?.product?.name)}
+                  </Text>
+                  <Text style={{ ...styles.tableCell, maxWidth: '35px' }} />
+                  <Text style={{ ...styles.tableCell, maxWidth: '45px' }}>{product?.count}</Text>
+                  <Text style={{ ...styles.tableCell, ...styles.tablePriceCol }}>
+                    {priceFormat(product?.prices?.selling?.price * (100 - product?.prices?.selling?.discount) / 100)}
+                    {(product?.prices?.selling?.currency?.symbol)}
+                  </Text>
+                  <Text style={{ ...styles.tableCell, ...styles.tablePriceCol }}>
+                    {priceFormat(product?.prices?.selling?.totalPrice)} {(product?.prices?.selling?.currency?.symbol)}
+                  </Text>
+                </View>
+              ))
+            }
+          </View>
+          <View>
+            <View style={styles.totalCalcTextWrapper}>
+              <Text style={styles.totalCalcText}>Жами сумма:</Text>
+              <View style={styles.totalCalcPriceText}>
+                {order?.totalPrices?.length ? (
+                  order.totalPrices.map(price => (
+                    <Text key={price?.currencyId}>
+                      {priceFormat(price?.total)} {price?.currency?.symbol}
+                    </Text>
+                  ))
+                ) : (
+                  <Text>0</Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.totalCalcTextWrapper}>
+              <Text style={styles.totalCalcText}>Тулов килинди:</Text>
+              <View style={styles.totalCalcPriceText}>
+                {order?.totalPayments?.length ? (
+                  order.totalPayments.map(price => (
+                    <Text key={price?.currencyId}>
+                      {priceFormat(price?.total)} {price?.currency?.symbol}
+                    </Text>
+                  ))
+                ) : (
+                  <Text>0</Text>
+                )}
+              </View>
+            </View>
+            <View style={styles.totalCalcTextWrapper}>
+              <Text style={styles.totalCalcText}>Мижоз карзи:</Text>
+              <View style={styles.totalCalcPriceText}>
+                {order?.client?.debtByCurrency?.length ? (
+                  order.client.debtByCurrency.map(price => (
+                    <Text key={price?.currency?.id}>
+                      {priceFormat(price?.amount)} {price?.currency?.symbol}
+                    </Text>
+                  ))
+                ) : (
+                  <Text>0</Text>
+                )}
+              </View>
+            </View>
+          </View>
         </View>
-        <View>
-          <View style={styles.totalCalcTextWrapper}>
-            <Text style={styles.totalCalcText}>Жами сумма:</Text>
-            <View style={styles.totalCalcPriceText}>
-              {order?.totalPrices?.map(price =>
-                <Text key={price?.currencyId}>{priceFormat(price?.total)} {(price?.currency?.symbol)}</Text>)}
-            </View>
-          </View>
-          <View style={styles.totalCalcTextWrapper}>
-            <Text style={styles.totalCalcText}>Тулов килинди:</Text>
-            <View style={styles.totalCalcPriceText}>
-              {order?.totalPayments?.map(price =>
-                <Text key={price?.currencyId}>{priceFormat(price?.total)} {(price?.currency?.symbol)}</Text>)}
-            </View>
-          </View>
-          <View style={styles.totalCalcTextWrapper}>
-            <Text style={styles.totalCalcText}>Мижоз карзи:</Text>
-            <View style={styles.totalCalcPriceText}>
-              {order?.client?.debtByCurrency?.map(price =>
-                <Text key={price?.currency?.id}>{priceFormat(price?.amount)} {(price?.currency?.symbol)}</Text>)}
-            </View>
-          </View>
-        </View>
-      </View>
-    </Page>
-  </Document>
-));
+      </Page>
+    </Document>
+  );
+});
 
 // PDF uchun stil
 const styles = StyleSheet.create({
@@ -137,13 +215,13 @@ const styles = StyleSheet.create({
     width: '70%',
   },
   titleSpan: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: 'NotoSansBold',
     fontWeight: 'bold',
     marginRight: 30,
   },
   titleSpanData: {
-    fontSize: 12,
+    fontSize: 10,
     fontFamily: 'NotoSans',
     maxWidth: '70%',
   },
@@ -162,7 +240,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'black',
     marginBottom: 10,
-    marginTop: 20,
+    marginTop: -10,
   },
   tableHeader: {
     flexDirection: 'row',
