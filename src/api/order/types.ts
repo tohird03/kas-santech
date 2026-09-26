@@ -17,7 +17,14 @@ export interface IOrder {
     amount: number;
     currency: ICurrency;
   }[];
-  clientDebtBeforeSelling: IOrderTotalPrice[];
+  clientDebtBeforeSelling: {
+    amount: number;
+    currency: ICurrency;
+  }[];
+  clientDebtAfterSelling: {
+    amount: number;
+    currency: ICurrency;
+  }[];
   totalPayments: IOrderTotalPrice[];
   totalPrices: IOrderTotalPrice[];
   payment?: IAddEditPaymentParams;

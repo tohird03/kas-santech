@@ -86,9 +86,9 @@ export const MyDocument = forwardRef<any, Props>(({ order }, ref) => {
 
                 <View style={styles.totalCalcPriceText}>
                   {order?.clientDebtBeforeSelling?.length ? (
-                    oldDebtByCurrency.map(price => (
-                      <Text key={price.currencyId}>
-                        {priceFormat(price.amount)} {price.symbol}
+                    order?.clientDebtBeforeSelling.map(price => (
+                      <Text key={price.currency?.id}>
+                        {priceFormat(price.amount)} {price?.currency.symbol}
                       </Text>
                     ))
                   ) : (
@@ -163,8 +163,8 @@ export const MyDocument = forwardRef<any, Props>(({ order }, ref) => {
             <View style={styles.totalCalcTextWrapper}>
               <Text style={styles.totalCalcText}>Мижоз карзи:</Text>
               <View style={styles.totalCalcPriceText}>
-                {order?.client?.debtByCurrency?.length ? (
-                  order.client.debtByCurrency.map(price => (
+                {order?.clientDebtAfterSelling?.length ? (
+                  order.clientDebtAfterSelling.map(price => (
                     <Text key={price?.currency?.id}>
                       {priceFormat(price?.amount)} {price?.currency?.symbol}
                     </Text>
