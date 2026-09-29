@@ -11,6 +11,7 @@ export interface IClientsInfo {
   id: string;
   fullname: string;
   phone: string;
+  phone2: string;
   debtByCurrency: IClientDebtByCurrency[];
   lastSellingDate: string;
   deedInfo: IClientDeedInfo;
@@ -83,6 +84,7 @@ export interface IAddEditClientInfo {
   id?: string;
   fullname: string;
   phone: string;
+  phone2: string;
 }
 
 export interface IGetClientDeedExcelParams {
@@ -103,6 +105,7 @@ export interface IClientStatistic {
   fullname: string;
   address: string;
   phone: string;
+  phone2: string;
   debtByCurrency: {
     amount: number;
     currency: ICurrency;

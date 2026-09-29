@@ -823,7 +823,8 @@ export const AddEditModal = observer(() => {
                         {client.fullname}
                       </div>
                       <div style={{ fontSize: 12, color: '#999' }}>
-                        {client.phone}
+                        <p style={{margin: 0}}>{client.phone}</p>
+                        <p style={{margin: 0}}>{client.phone2}</p>
                       </div>
 
                     </div>

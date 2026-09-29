@@ -271,12 +271,27 @@ export const AddEditModal = observer(() => {
     });
   }, [settlement]);
 
-  const clientsOptions = useMemo(() => (
-    clientsData?.data?.data.map((supplier) => ({
-      value: supplier?.id,
-      label: `${supplier?.fullname}: +${supplier?.phone}`,
-    }))
-  ), [clientsData]);
+  const clientsOptions = useMemo(() => {
+    const options =
+      clientsData?.data?.data?.map((client) => ({
+        value: client.id,
+        label: `${client.fullname}: +${client.phone}`,
+      })) || [];
+
+    const currentClient = paymentsStore.singlePayment?.client;
+
+    if (
+      currentClient &&
+      !options.some((item) => item.value === currentClient.id)
+    ) {
+      options.unshift({
+        value: currentClient.id,
+        label: `${currentClient.fullname}: +${currentClient.phone}`,
+      });
+    }
+
+    return options;
+  }, [clientsData, paymentsStore.singlePayment]);
 
   const currencyManyData = useMemo(() => (
     currencyMany?.data.map((currency) => ({
@@ -288,6 +303,36 @@ export const AddEditModal = observer(() => {
   ), [currencyMany]);
 
   const clientDebt = paymentsStore?.singlePayment?.client?.debtByCurrency ?? [];
+
+  useEffect(() => {
+    const payment = paymentsStore.singlePayment;
+
+    if (!payment) {
+      form.resetFields();
+
+      form.setFieldsValue({
+        paymentMethods: [
+          {
+            amount: 0,
+            type: PaymentTypes.CASH,
+            currencyId: authStore?.staffInfo?.currency?.id,
+          },
+        ],
+      });
+
+      setSelectedClient(null);
+
+      return;
+    }
+
+    form.setFieldsValue({
+      clientId: payment.client?.id,
+      paymentMethods: payment.paymentMethods || [],
+      description: payment.description || '',
+    });
+
+    setSelectedClient(payment.client || null);
+  }, [paymentsStore.singlePayment, form]);
 
   return (
     <Modal

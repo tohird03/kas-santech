@@ -45,7 +45,12 @@ export const AddEditModal = observer(() => {
   const handleSubmit = (values: IAddEditClientInfo) => {
     const valueControl = {
       ...values,
-      phone: `998${values?.phone}`,
+      ...(values?.phone && {
+        phone: `998${values.phone}`,
+      }),
+      ...(values?.phone2 && {
+        phone2: `998${values.phone2}`,
+      }),
     };
 
     setLoading(true);
@@ -108,6 +113,23 @@ export const AddEditModal = observer(() => {
           label="Telefon raqami: 901234567"
           rules={[
             {required: true},
+            {
+              pattern: regexPhoneNumber,
+              message: 'Raqamni to\'g\'ri kiriting!, Masalan: 901234567',
+            },
+          ]}
+        >
+          <InputNumber
+            addonBefore="+998"
+            placeholder="Telefon raqami"
+            style={{width: '100%'}}
+            type="number"
+          />
+        </Form.Item>
+        <Form.Item
+          name="phone2"
+          label="Qo'shimcha telefon raqami: 901234567"
+          rules={[
             {
               pattern: regexPhoneNumber,
               message: 'Raqamni to\'g\'ri kiriting!, Masalan: 901234567',

@@ -2,7 +2,7 @@ import React from 'react';
 import { ColumnType } from 'antd/es/table';
 import { IClientDebtFilter, IClientsInfo } from '@/api/clients';
 import { Action } from './Action';
-import { formatPhoneNumber } from '@/utils/phoneFormat';
+import { formatPhoneNumber, phoneFormat } from '@/utils/phoneFormat';
 import { priceFormat } from '@/utils/priceFormat';
 import { ClientNameLink } from '@/pages/ActionComponents/ClientNameLink';
 import { getFullDateFormat } from '@/utils/getDateFormat';
@@ -29,7 +29,16 @@ export const clientsColumns: ColumnType<IClientsInfo>[] = [
     dataIndex: 'phone',
     title: 'Telefon raqami',
     align: 'center',
-    render: (value, record) => `+${formatPhoneNumber(record?.phone)}`,
+    render: (value, record) => (
+      <div>
+        {record?.phone &&
+          <p style={{margin: 0}}>{formatPhoneNumber(record?.phone)}</p>
+        }
+        {record?.phone2 &&
+          <p style={{margin: 0}}>{formatPhoneNumber(record?.phone2)}</p>
+        }
+      </div>
+    ),
   },
   {
     key: 'debt',
