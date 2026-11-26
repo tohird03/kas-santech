@@ -41,7 +41,7 @@ export function calculateSettlement(
   // ===============================
   // 1. USD payment → USD debt yopish
   // ===============================
-  const usdUsed = Math.min(payUSD, usdDebt);
+  const usdUsed = Math.min(payUSD, Math.max(0, usdDebt));
 
   usdDebt -= usdUsed;
   payUSD -= usdUsed;
@@ -57,7 +57,7 @@ export function calculateSettlement(
   // ===============================
   // 3. UZS payment → UZS debt yopish
   // ===============================
-  const uzsUsed = Math.min(payUZS, uzsDebt);
+  const uzsUsed = Math.min(payUZS, Math.max(0, uzsDebt));
 
   uzsDebt -= uzsUsed;
   payUZS -= uzsUsed;
@@ -92,7 +92,7 @@ export function calculateSettlement(
   // -------------------------------
   // 1. USD → USD yopish
   // -------------------------------
-  const usdUsedChange = Math.min(cPayUSD, cOrdUSD);
+  const usdUsedChange = Math.min(cPayUSD, Math.max(0, cOrdUSD));
 
   cPayUSD -= usdUsedChange;
   cOrdUSD -= usdUsedChange;
@@ -100,7 +100,7 @@ export function calculateSettlement(
   // -------------------------------
   // 2. UZS → UZS yopish
   // -------------------------------
-  const uzsUsedChange = Math.min(cPayUZS, cOrdUZS);
+  const uzsUsedChange = Math.min(cPayUZS, Math.max(0, cOrdUZS));
 
   cPayUZS -= uzsUsedChange;
   cOrdUZS -= uzsUsedChange;

@@ -5,7 +5,7 @@ import { Button, DatePicker, Form, InputNumber, Modal, Popconfirm, Select, Spin 
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { productsListStore, returnedOrdersStore } from '@/stores/products';
-import { priceFormat } from '@/utils/priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
 import { CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { DataTable } from '@/components/Datatable/datatable';
 import { useMediaQuery } from '@/utils/mediaQuery';
@@ -273,6 +273,7 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.price}
+            parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangePrice}
@@ -581,7 +582,8 @@ export const AddEditModal = observer(() => {
             placeholder="Mahsulot sonini kiriting"
             style={{ width: '100%' }}
             ref={countInputRef}
-            formatter={(value) => priceFormat(value!)}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
           />
         </Form.Item>
         <Button

@@ -5,7 +5,7 @@ import { Button, Checkbox, DatePicker, Form, Image, Input, InputNumber, Modal, P
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { ordersStore, productsListStore } from '@/stores/products';
-import { priceFormat } from '@/utils/priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
 import { CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { clientsInfoStore, singleClientStore } from '@/stores/clients';
@@ -468,6 +468,7 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.price}
+            parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangePrice}
@@ -1004,7 +1005,8 @@ export const AddEditModal = observer(() => {
           <InputNumber
             placeholder="Chegirma qiymatini kiriting"
             style={{ width: '100%' }}
-            formatter={(value) => priceFormat(value!)}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
           />
         </Form.Item>
         <Form.Item
@@ -1017,7 +1019,8 @@ export const AddEditModal = observer(() => {
             placeholder="Mahsulot sonini kiriting"
             style={{ width: '100%' }}
             ref={countInputRef}
-            formatter={(value) => priceFormat(value!)}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
           />
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>

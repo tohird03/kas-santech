@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Form, Input, InputNumber, Modal, Select, Spin, message, notification } from 'antd';
 import { observer } from 'mobx-react';
-import { priceFormat } from '@/utils/priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
 import { IPaymentType } from '@/api/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { clientsInfoStore, paymentsStore, singleClientStore } from '@/stores/clients';
@@ -343,11 +343,17 @@ export const AddEditModal = observer(() => {
             To&apos;lov
           </p>
           <p style={{ margin: 0 }}>
-            {clientDebt?.length > 0 && `Mijoz qarzi: ${paymentsStore?.singlePayment?.client?.debtByCurrency?.map(debt => (
-              <span key={debt?.currency?.id}>
-                {debt?.amount}{currencyTagUi(debt?.currency?.symbol)}
-              </span>
-            ))}`}
+            {clientDebt.length > 0 && (
+              <>
+                Mijoz qarzi:
+                {clientDebt.map((debt) => (
+                  <span key={debt?.currency?.id} style={{ marginLeft: 6 }}>
+                    {priceFormat(debt?.amount)}
+                    {currencyTagUi(debt?.currency?.symbol)}
+                  </span>
+                ))}
+              </>
+            )}
           </p>
         </div>
       }
@@ -446,7 +452,8 @@ export const AddEditModal = observer(() => {
                       <InputNumber
                         key={form.getFieldValue(['paymentMethods', name, 'currencyId'])}
                         style={{ width: '100%' }}
-                        formatter={(value) => priceFormat(value!)}
+                        formatter={formatPriceInput}
+                        parser={parsePriceInput}
                         placeholder="0"
                       />
                     </Form.Item>
@@ -519,7 +526,8 @@ export const AddEditModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={(value) => priceFormat(value)}
+                      formatter={formatPriceInput}
+                      parser={parsePriceInput}
                       onChange={(val) => handleChangeUpdate('uzs', Number(val || 0))}
                     />
                   </Form.Item>
@@ -533,7 +541,8 @@ export const AddEditModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={(value) => priceFormat(value)}
+                      formatter={formatPriceInput}
+                      parser={parsePriceInput}
                       onChange={(val) => handleChangeUpdate('usd', Number(val || 0))}
                     />
                   </Form.Item>
@@ -547,7 +556,8 @@ export const AddEditModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.uzs}
-                  formatter={(v) => priceFormat(v)}
+                  formatter={formatPriceInput}
+                  parser={parsePriceInput}
                   onChange={(val) => handleCashChange('uzs', Number(val || 0))}
                 />
               </Form.Item>
@@ -559,7 +569,8 @@ export const AddEditModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.usd}
-                  formatter={(v) => priceFormat(v)}
+                  formatter={formatPriceInput}
+                  parser={parsePriceInput}
                   onChange={(val) => handleCashChange('usd', Number(val || 0))}
                 />
               </Form.Item>

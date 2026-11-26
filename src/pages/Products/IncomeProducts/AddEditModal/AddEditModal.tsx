@@ -5,7 +5,7 @@ import { Button, DatePicker, Form, Image, Input, InputNumber, Modal, Popconfirm,
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { incomeProductsStore, productsListStore } from '@/stores/products';
-import { priceFormat } from '@/utils/priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
 import { CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMediaQuery } from '@/utils/mediaQuery';
 import dayjs from 'dayjs';
@@ -365,6 +365,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
+            parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangePrice}
@@ -381,6 +382,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
+            parser={parsePriceInput}
             placeholder="Sotish narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeSellingPrice}
@@ -799,7 +801,8 @@ export const AddEditIncomeOrderModal = observer(() => {
             placeholder="Tushuriladigan mahsulot sonini kiriting"
             style={{ width: '100%' }}
             ref={countInputRef}
-            formatter={(value) => priceFormat(value!)}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
           />
         </Form.Item>
         <Button

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Form, Input, InputNumber, Modal, Select, message, notification } from 'antd';
 import { observer } from 'mobx-react';
-import { priceFormat } from '@/utils/priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
 import { IPaymentType } from '@/api/types';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { singleClientStore } from '@/stores/clients';
@@ -379,7 +379,8 @@ export const PaymentModal = observer(() => {
                       <InputNumber
                         key={form.getFieldValue(['payments', name, 'currencyId'])}
                         style={{ width: '100%' }}
-                        formatter={(value) => priceFormat(value!)}
+                        formatter={formatPriceInput}
+                        parser={parsePriceInput}
                         placeholder="0"
                       />
                     </Form.Item>
@@ -451,7 +452,8 @@ export const PaymentModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={(value) => priceFormat(value)}
+                      formatter={formatPriceInput}
+                      parser={parsePriceInput}
                       onChange={(val) => handleChangeUpdate('uzs', Number(val || 0))}
                     />
                   </Form.Item>
@@ -465,7 +467,8 @@ export const PaymentModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={(value) => priceFormat(value)}
+                      formatter={formatPriceInput}
+                      parser={parsePriceInput}
                       onChange={(val) => handleChangeUpdate('usd', Number(val || 0))}
                     />
                   </Form.Item>
@@ -479,7 +482,8 @@ export const PaymentModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.uzs}
-                  formatter={(v) => priceFormat(v)}
+                  formatter={formatPriceInput}
+                  parser={parsePriceInput}
                   onChange={(val) => handleCashChange('uzs', Number(val || 0))}
                 />
               </Form.Item>
@@ -491,7 +495,8 @@ export const PaymentModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.usd}
-                  formatter={(v) => priceFormat(v)}
+                  formatter={formatPriceInput}
+                  parser={parsePriceInput}
                   onChange={(val) => handleCashChange('usd', Number(val || 0))}
                 />
               </Form.Item>

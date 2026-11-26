@@ -1,7 +1,7 @@
 import React from 'react';
 import { Form, Input, InputNumber, Select } from 'antd';
 import { DEFAULTVALUTE, OPTIONVALUTE, PRICEUSDVALUE } from '@/constants';
-import { priceFormat } from '../priceFormat';
+import { formatPriceInput, parsePriceInput, priceFormat } from '../priceFormat';
 import { BaseOptionType } from 'antd/es/select';
 import { authStore } from '@/stores/auth';
 import { ICurrency, ICurrencyOptions } from '@/api/auth/types';
@@ -71,7 +71,8 @@ export const PriceWithCurrency = ({
           rules={required ? [{ required: true }] : []}
         >
           <InputNumber
-            formatter={(value) => priceFormat(value!)}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
             placeholder="0"
             style={{ width: '70%' }}
             onKeyDown={onKeyDown}
