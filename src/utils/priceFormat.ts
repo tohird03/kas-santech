@@ -23,9 +23,9 @@ export const priceFormat = (price: string | number | null | undefined) => {
  * Probel — minglik ajratuvchi (22 296 → 22296).
  * Standart InputNumber parser vergullarni tashlab, 22,296 ni 22296 qilib yuborardi.
  */
-export const parsePriceInput = (value?: string) => {
-  if (value == null || value === '') {
-    return '';
+export const parsePriceInput = (value?: string): number => {
+  if (value == null || value.trim() === '') {
+    return 0;
   }
 
   let normalized = String(value).replace(/[\s\u00A0]/g, '');
@@ -54,13 +54,14 @@ export const parsePriceInput = (value?: string) => {
   const body = decimalParts.length
     ? `${integerPart || '0'}.${decimalParts.join('')}`
     : integerPart;
+  const parsed = Number(`${negative ? '-' : ''}${body}`);
 
-  return `${negative ? '-' : ''}${body}`;
+  return Number.isFinite(parsed) ? parsed : 0;
 };
 
 export const formatPriceInput = (
   value?: string | number | null,
-  info?: { userTyping?: boolean; input?: string },
+  info?: {userTyping?: boolean, input?: string}
 ) => {
   if (info?.userTyping) {
     return info.input ?? '';

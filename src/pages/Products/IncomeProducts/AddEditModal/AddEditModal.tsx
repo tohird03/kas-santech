@@ -365,6 +365,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
+            formatter={formatPriceInput}
             parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
@@ -382,6 +383,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
+            formatter={formatPriceInput}
             parser={parsePriceInput}
             placeholder="Sotish narxi"
             disabled={isUpdatingProduct?.id !== record?.id}

@@ -273,6 +273,7 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.price}
+            formatter={formatPriceInput}
             parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
