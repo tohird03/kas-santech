@@ -3,7 +3,7 @@ import { observer } from 'mobx-react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Form, Input, InputNumber, Modal, Select } from 'antd';
 import { addNotification } from '@/utils';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { priceInputProps } from '@/utils/priceFormat';
 import { IEditCurrency } from '@/api/auth/types';
 import { currencyStore } from '@/stores/workers';
 import { authApi } from '@/api';
@@ -88,8 +88,7 @@ export const AddEditModal = observer(() => {
         >
           <InputNumber
             style={{ width: '100%' }}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
 

@@ -13,7 +13,7 @@ import styles from './client-info.scss';
 import { clientDebtFilter, clientsColumns } from './constants';
 import { IClientDebtFilter, IClientsInfo, clientsInfoApi } from '@/api/clients';
 import { addNotification } from '@/utils';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { priceFormat, priceInputProps } from '@/utils/priceFormat';
 import { ordersStore } from '@/stores/products';
 import { homeStore } from '@/stores/home/home';
 import { currencyTagUi } from '@/constants/payment';
@@ -123,8 +123,7 @@ export const ClientsInfo = observer(() => {
           />
           <InputNumber
             placeholder="Qarz miqdorini kiriting"
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             onChange={handleDebtValueChange}
             style={{ width: '350px' }}
             defaultValue={0}

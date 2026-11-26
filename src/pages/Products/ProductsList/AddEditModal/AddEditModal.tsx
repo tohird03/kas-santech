@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Form, Image, Input, InputNumber, Modal, Select, Upload, UploadFile, UploadProps } from 'antd';
 import { addNotification } from '@/utils';
 import { productsListStore } from '@/stores/products';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { priceFormat, priceInputProps } from '@/utils/priceFormat';
 import { productsApi } from '@/api/product/product';
 import { IAddEditProduct, IAddEditProductForm } from '@/api/product/types';
 import { PriceWithCurrency } from '@/utils/hooks/valuteConversition';
@@ -217,8 +217,7 @@ export const AddEditModal = observer(() => {
           <InputNumber
             placeholder="Qoldiq mahsulot"
             style={{ width: '100%' }}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
         <Form.Item
@@ -228,8 +227,7 @@ export const AddEditModal = observer(() => {
           <InputNumber
             placeholder="Ushbu sondan kam qolgan mahsulot haqida sizni ogohlantiramiz!"
             style={{ width: '100%' }}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
         <PriceWithCurrency

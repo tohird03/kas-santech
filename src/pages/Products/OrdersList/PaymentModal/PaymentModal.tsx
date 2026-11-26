@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button, Card, Form, Input, InputNumber, Modal, Select, message, notification } from 'antd';
 import { observer } from 'mobx-react';
 import { ordersStore } from '@/stores/products';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { priceFormat, priceInputProps } from '@/utils/priceFormat';
 import { IPaymentType } from '@/api/types';
 import { addNotification } from '@/utils';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -212,9 +212,19 @@ export const PaymentModal = observer(() => {
   const usdChange = Form.useWatch('usdChange', form) || 0;
 
   useEffect(() => {
+    const uzsChange = settlement.change.uzs > 0 ? settlement.change.uzs : undefined;
+    const usdChange = settlement.change.usd > 0 ? settlement.change.usd : undefined;
+    const sameChange = form.getFieldValue('uzsChange') === uzsChange
+      && form.getFieldValue('usdChange') === usdChange;
+    const cashEmpty = !form.getFieldValue('uzsCash') && !form.getFieldValue('usdCash');
+
+    if (sameChange && cashEmpty) {
+      return;
+    }
+
     form.setFieldsValue({
-      uzsChange: settlement.change.uzs || 0,
-      usdChange: settlement.change.usd || 0,
+      uzsChange,
+      usdChange,
       uzsCash: 0,
       usdCash: 0,
     });
@@ -239,13 +249,6 @@ export const PaymentModal = observer(() => {
       [`${type}Change`]: clientValue,
     });
   };
-
-  useEffect(() => {
-    form.setFieldsValue({
-      uzsChange: settlement.change.uzs > 0 ? settlement.change.uzs : undefined,
-      usdChange: settlement.change.usd > 0 ? settlement.change.usd : undefined,
-    });
-  }, [settlement]);
 
   const currencyManyData = useMemo(() => (
     currencyMany?.data.map((currency) => ({
@@ -385,8 +388,7 @@ export const PaymentModal = observer(() => {
                       <InputNumber
                         key={form.getFieldValue(['payments', name, 'currencyId'])}
                         style={{ width: '100%' }}
-                        formatter={formatPriceInput}
-                        parser={parsePriceInput}
+                        {...priceInputProps}
                         placeholder="0"
                       />
                     </Form.Item>
@@ -458,8 +460,7 @@ export const PaymentModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={formatPriceInput}
-                      parser={parsePriceInput}
+                      {...priceInputProps}
                       onChange={(val) => handleChangeUpdate('uzs', Number(val || 0))}
                     />
                   </Form.Item>
@@ -473,8 +474,7 @@ export const PaymentModal = observer(() => {
                   >
                     <InputNumber
                       style={{ width: '100%' }}
-                      formatter={formatPriceInput}
-                      parser={parsePriceInput}
+                      {...priceInputProps}
                       onChange={(val) => handleChangeUpdate('usd', Number(val || 0))}
                     />
                   </Form.Item>
@@ -488,8 +488,7 @@ export const PaymentModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.uzs}
-                  formatter={formatPriceInput}
-                  parser={parsePriceInput}
+                  {...priceInputProps}
                   onChange={(val) => handleCashChange('uzs', Number(val || 0))}
                 />
               </Form.Item>
@@ -501,8 +500,7 @@ export const PaymentModal = observer(() => {
                   style={{ width: '100%' }}
                   min={0}
                   max={settlement.change.usd}
-                  formatter={formatPriceInput}
-                  parser={parsePriceInput}
+                  {...priceInputProps}
                   onChange={(val) => handleCashChange('usd', Number(val || 0))}
                 />
               </Form.Item>

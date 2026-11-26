@@ -5,7 +5,7 @@ import { Button, Checkbox, DatePicker, Form, Image, Input, InputNumber, Modal, P
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { ordersStore, productsListStore } from '@/stores/products';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { onPriceInputKeyDown, priceFormat, priceInputProps } from '@/utils/priceFormat';
 import { CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import dayjs, { Dayjs } from 'dayjs';
 import { clientsInfoStore, singleClientStore } from '@/stores/clients';
@@ -446,13 +446,14 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.count}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeCount}
             ref={changeCountRef}
             onKeyDown={(event) => {
+              onPriceInputKeyDown(event);
+
               if (event.key === 'Enter') {
                 handleSaveAndUpdateOrderProduct();
               }
@@ -470,13 +471,14 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.price}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangePrice}
             ref={changeCostRef}
             onKeyDown={(event) => {
+              onPriceInputKeyDown(event);
+
               if (event.key === 'Enter') {
                 handleSaveAndUpdateOrderProduct();
               }
@@ -497,13 +499,14 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.discount}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Chegirma"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeDiscount}
             ref={changeDiscountRef}
             onKeyDown={(event) => {
+              onPriceInputKeyDown(event);
+
               if (event.key === 'Enter') {
                 handleSaveAndUpdateOrderProduct();
               }
@@ -1010,8 +1013,7 @@ export const AddEditModal = observer(() => {
           <InputNumber
             placeholder="Chegirma qiymatini kiriting"
             style={{ width: '100%' }}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
         <Form.Item
@@ -1024,8 +1026,7 @@ export const AddEditModal = observer(() => {
             placeholder="Mahsulot sonini kiriting"
             style={{ width: '100%' }}
             ref={countInputRef}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
         <div style={{ display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>

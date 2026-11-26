@@ -14,7 +14,7 @@ import { supplierInfoStore } from '@/stores/supplier';
 import { ISupplierDebtFilter, ISupplierInfo } from '@/api/supplier/types';
 import { supplierInfoApi } from '@/api/supplier/supplier';
 import { addNotification } from '@/utils';
-import { formatPriceInput, parsePriceInput } from '@/utils/priceFormat';
+import { priceInputProps } from '@/utils/priceFormat';
 
 const cn = classNames.bind(styles);
 
@@ -108,8 +108,7 @@ export const SupplierInfo = observer(() => {
           />
           <InputNumber
             placeholder="Qarz miqdorini kiriting"
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             onChange={handleDebtValueChange}
             style={{ width: '350px' }}
             defaultValue={0}

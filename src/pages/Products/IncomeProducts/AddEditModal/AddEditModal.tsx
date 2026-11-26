@@ -5,7 +5,7 @@ import { Button, DatePicker, Form, Image, Input, InputNumber, Modal, Popconfirm,
 import classNames from 'classnames';
 import { addNotification } from '@/utils';
 import { incomeProductsStore, productsListStore } from '@/stores/products';
-import { formatPriceInput, parsePriceInput, priceFormat } from '@/utils/priceFormat';
+import { priceFormat, priceInputProps } from '@/utils/priceFormat';
 import { CheckOutlined, DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { useMediaQuery } from '@/utils/mediaQuery';
 import dayjs from 'dayjs';
@@ -349,8 +349,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.count}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Soni"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeCount}
@@ -367,8 +366,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangePrice}
@@ -385,8 +383,7 @@ export const AddEditIncomeOrderModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.cost?.price}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
             placeholder="Sotish narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeSellingPrice}
@@ -805,8 +802,7 @@ export const AddEditIncomeOrderModal = observer(() => {
             placeholder="Tushuriladigan mahsulot sonini kiriting"
             style={{ width: '100%' }}
             ref={countInputRef}
-            formatter={formatPriceInput}
-            parser={parsePriceInput}
+            {...priceInputProps}
           />
         </Form.Item>
         <Button
