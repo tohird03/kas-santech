@@ -106,23 +106,82 @@ const isZeroText = (value: string) => {
   return compact === '0' || compact === '0.0' || compact === '0.00' || compact === '0.000';
 };
 
+const isShortcut = (event: {ctrlKey: boolean, metaKey: boolean, altKey: boolean}) => (
+  event.ctrlKey || event.metaKey || event.altKey
+);
+
 export const onPriceInputKeyDown = (event: {
   key: string;
+  ctrlKey: boolean;
+  metaKey: boolean;
+  altKey: boolean;
   preventDefault: () => void;
   currentTarget: HTMLInputElement;
 }) => {
-  if (event.key === ',' || event.key === '，') {
+  if (isShortcut(event)) {
+    return;
+  }
+
+  const isDigit = event.key >= '0' && event.key <= '9';
+
+  if (isDigit) {
+    if (isZeroText(event.currentTarget.value)) {
+      event.currentTarget.select();
+    }
+
+    return;
+  }
+
+  if (event.key === '.') {
+    if (event.currentTarget.value.includes('.')) {
+      event.preventDefault();
+    }
+
+    return;
+  }
+
+  if (event.key === '-') {
+    const input = event.currentTarget;
+    const start = input.selectionStart ?? 0;
+
+    if (input.value.includes('-') || start !== 0) {
+      event.preventDefault();
+    }
+
+    return;
+  }
+
+  if (event.key.length === 1) {
+    event.preventDefault();
+  }
+};
+
+export const onPriceInputBeforeInput = (event: {
+  preventDefault: () => void;
+  currentTarget: HTMLInputElement;
+  nativeEvent: Event;
+}) => {
+  const data = 'data' in event.nativeEvent
+    ? (event.nativeEvent as InputEvent).data
+    : null;
+
+  if (data == null || data === '') {
+    return;
+  }
+
+  if (/[^\d.-]/.test(data)) {
     event.preventDefault();
 
     return;
   }
 
-  if (event.key < '0' || event.key > '9') {
-    return;
-  }
+  const input = event.currentTarget;
+  const start = input.selectionStart ?? input.value.length;
+  const end = input.selectionEnd ?? input.value.length;
+  const next = `${input.value.slice(0, start)}${data}${input.value.slice(end)}`;
 
-  if (isZeroText(event.currentTarget.value)) {
-    event.currentTarget.select();
+  if ((next.match(/\./g) || []).length > 1 || !/^-?\d*\.?\d*$/.test(next)) {
+    event.preventDefault();
   }
 };
 
@@ -142,6 +201,7 @@ export const priceInputProps = {
   formatter: formatPriceInput,
   parser: parsePriceInput,
   onKeyDown: onPriceInputKeyDown,
+  onBeforeInput: onPriceInputBeforeInput,
   onFocus: selectPriceZero,
   onMouseUp: selectPriceZero,
 };
