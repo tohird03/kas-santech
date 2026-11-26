@@ -446,6 +446,8 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.count}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
             placeholder="Narxi"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeCount}
@@ -495,6 +497,8 @@ export const AddEditModal = observer(() => {
         isUpdatingProduct?.id === record?.id ? (
           <InputNumber
             defaultValue={record?.prices?.selling?.discount}
+            formatter={formatPriceInput}
+            parser={parsePriceInput}
             placeholder="Chegirma"
             disabled={isUpdatingProduct?.id !== record?.id}
             onChange={handleChangeDiscount}
